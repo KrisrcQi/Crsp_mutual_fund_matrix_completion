@@ -1,0 +1,71 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torch_geometric.data import Data, DataLoader
+from torch_geometric.nn import GCNConv
+
+# Assuming you have a matrix dataset called 'data' with missing values
+
+# Step 1: Convert matrix to graph representation
+adjacency_matrix = torch.tensor(data)  # Convert matrix to tensor
+edge_index = adjacency_matrix.nonzero().t()  # Get indices of non-zero values as edges
+x = torch.randn(adjacency_matrix.size(0), num_features)  # Node features (randomly initialized)
+
+# Step 2: Split the dataset
+# Randomly remove some values to create observed values dataset
+observed_matrix = adjacency_matrix.clone()
+indices = torch.randperm(adjacency_matrix.numel())[:int(0.8 * adjacency_matrix.numel())]
+observed_matrix.view(-1)[indices] = float('nan')
+# Keep missing values as the evaluation dataset
+missing_values = adjacency_matrix.clone()
+missing_values.view(-1)[indices] = float('nan')
+
+# Step 3: Construct the GNN model
+class GNNModel(nn.Module):
+    def __init__(self, input_dim, hidden_dim):
+        super(GNNModel, self).__init__()
+        self.conv1 = GCNConv(input_dim, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, hidden_dim)
+        self.fc = nn.Linear(hidden_dim, 1)
+
+    def forward(self, x, edge_index):
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.relu(self.conv2(x, edge_index))
+        x = self.fc(x).squeeze()
+        return x
+
+input_dim = num_features  # Dimensionality of input features
+hidden_dim = 64  # Dimensionality of hidden layers
+
+model = GNNModel(input_dim, hidden_dim)
+
+# Step 4: Train the GNN model
+criterion = nn.MSELoss()  # Mean Squared Error loss
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+data = Data(x=x, edge_index=edge_index)
+loader = DataLoader([data], batch_size=1)  # DataLoader for a single graph
+
+num_epochs = 100
+model.train()
+for epoch in range(num_epochs):
+    for batch in loader:
+        optimizer.zero_grad()
+        output = model(batch.x, batch.edge_index)
+        loss = criterion(output, batch.x.view(-1))  # Compare output to observed values
+        loss.backward()
+        optimizer.step()
+
+# Step 5: Evaluate the GNN model
+model.eval()
+with torch.no_grad():
+    missing_values_prediction = model(x, edge_index)  # Predict missing values
+
+# Convert the predicted missing values back to a matrix
+predicted_matrix = adjacency_matrix.clone()
+predicted_matrix.view(-1)[indices] = missing_values_prediction
+
+# Print the predicted matrix
+print(predicted_matrix)
+
