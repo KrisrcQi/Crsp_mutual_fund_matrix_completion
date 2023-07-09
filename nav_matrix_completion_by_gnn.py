@@ -38,23 +38,19 @@ cols = [cols[-1]] + cols[:-1]
 # Reorder the dataframe columns
 df = df[cols]
 
-df
+print(df)
 
 df.drop(df.columns[1], axis=1, inplace=True)
-df
+print(df)
 
-df.drop(df.columns[-1], axis=1, inplace=True)
-df
-
-df.drop(df.columns[-1], axis=1, inplace=True)
-df
-
+df.drop(df.columns[1], axis=1, inplace=True)
+dprint(df)
 print(type(df['date_float'][0]))
-
 df.to_csv('nav_matrix_float_version.csv')
 
-!pip install torch-geometric
 
+#GNN model 
+!pip install torch-geometric
 
 
 import torch
@@ -72,11 +68,17 @@ adjacency_matrix = torch.tensor(data.values)  # Convert matrix to tensor
 edge_index = adjacency_matrix.nonzero().t()  # Get indices of non-zero values as edges
 x = torch.randn(adjacency_matrix.size(0), num_features)  # Node features (randomly initialized)
 
-adjacency_matrix
+#Assuming adjacency matrix is your adjacency matrix
+num_nodes = adjacency_matrix.size(0) 
+# Get the number of nodes
+# Create a mask that is True for valid indices and False for out-of-bounds indices
+mask = (edge_index[0] < num_nodes) & (edge_index[1] < num_nodes)
+# AppIy the mask to edge index
+edge_index = edge_index[:, mask]
 
-edge_index
-
-x
+print(adjacency_matrix)
+print(edge_index)
+print(x)
 
 # Step 2: Split the dataset
 # Randomly remove some values to create observed values dataset
@@ -88,7 +90,7 @@ observed_matrix.reshape(-1)[indices] = float('nan')
 missing_values = adjacency_matrix.clone()
 missing_values.reshape(-1)[indices] = float('nan')
 
-len(indices)
+print(len(indices))
 
 valid_indices = indices[indices < adjacency_matrix.numel()]
 valid_values = adjacency_matrix.flatten()[valid_indices]
