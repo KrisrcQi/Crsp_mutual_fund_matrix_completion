@@ -101,9 +101,9 @@ history = model.fit([X1_train, X2_train], y_train, epochs=40, batch_size=32, ver
 
 # Commented out IPython magic to ensure Python compatibility.
 # Load the TensorBoard notebook extension
-# %load_ext tensorboard
+%load_ext tensorboard
 
-tensorboard --logdir=logs --port=6007
+%tensorboard --logdir=logs --port=6007
 
 # Step 9: Make predictions on the test set
 y_pred = model.predict([X1_test, X2_test])
@@ -114,7 +114,6 @@ y_pred
 
 # Assuming y_test and y_pred are NumPy arrays
 # Assuming y_test and y_pred are not 1-dimensional arrays
-
 y_test_1d = np.reshape(y_test, (-1,))
 y_pred_1d = np.reshape(y_pred, (-1,))
 
