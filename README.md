@@ -1,4 +1,4 @@
-Mutual fund matrix completion by IGMC with return prediction
+Matrix Completion and Return Predictability Based on Machine Learning Approaches 
 ===============================================================================
 
 Methodology
@@ -21,3 +21,9 @@ The methodology of this research could be divided into three parts:
 
 ### FFN for return prediction 
 ![FFN](https://github.com/KrisrcQi/Crsp_mutual_fund_matrix_completion/assets/117539900/8e66b59c-6f49-4ea1-b087-67ce5af0460b)
+
+Data
+------
+Following the literature of Kaniel et al. (2023), this research continues its findings. It focuses on the mutual fund data from the Center for Research in Security Prices (CRSP) database, especially taking the results of fund flow and momentum (sentiment factors), which are the most significant predictors for return predictability.
+
+
